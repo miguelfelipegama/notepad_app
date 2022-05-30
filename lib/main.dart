@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:notepad_app/views/login_view.dart';
 import 'package:notepad_app/views/register_view.dart';
 import 'package:notepad_app/views/verify_email_view.dart';
-
+import 'dart:developer' as devtools show log;
 import 'firebase_options.dart';
 
 void main() {
@@ -17,10 +17,13 @@ void main() {
     home: const HomePage(),
     routes: {
       '/login/': (context) => const LoginView(),
-      '/register/': (context) => const RegisterView()
+      '/register/': (context) => const RegisterView(),
+      '/verify/': (context) => const VerifyEmailView()
     },
   ));
 }
+
+enum MenuAction { logout }
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -35,17 +38,46 @@ class HomePage extends StatelessWidget {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
               final user = FirebaseAuth.instance.currentUser;
-              if (user == null) {
-                return const LoginView();
+              return NotesView();
+              if (user != null) {
+                if (user.emailVerified) {
+                  return const NotesView();
+                } else {
+                  return const VerifyEmailView();
+                }
               }
-              if (user.emailVerified == false) {
-                return const LoginView();
-              } else {
-                return const VerifyEmailView();
-              }
+              return const LoginView();
             default:
               return const Text('Loading');
           }
         });
+  }
+}
+
+class NotesView extends StatefulWidget {
+  const NotesView({Key? key}) : super(key: key);
+
+  @override
+  State<NotesView> createState() => _NotesViewState();
+}
+
+class _NotesViewState extends State<NotesView> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Your Notes'),
+        actions: [
+          PopupMenuButton<MenuAction>(onSelected: (value) {
+            devtools.log(value.toString());
+          }, itemBuilder: (context) {
+            return [
+              const PopupMenuItem(
+                  value: MenuAction.logout, child: Text('Log out'))
+            ];
+          })
+        ],
+      ),
+    );
   }
 }

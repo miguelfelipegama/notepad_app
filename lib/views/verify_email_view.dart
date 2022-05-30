@@ -19,10 +19,32 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
             TextButton(
               onPressed: () async {
                 final user = FirebaseAuth.instance.currentUser;
-                await user?.sendEmailVerification();
+                print(user);
+                try {
+                  await user?.sendEmailVerification();
+                } on FirebaseAuthException catch (e) {
+                  showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                      title: const Text('Verification Error'),
+                      content: Text(e.code.toString()),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, 'OK'),
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
               },
               child: const Text("Send verification email"),
-            )
+            ),
+            TextButton(
+                onPressed: () {
+                  FirebaseAuth.instance.signOut();
+                },
+                child: const Text("Signout"))
           ],
         ));
   }

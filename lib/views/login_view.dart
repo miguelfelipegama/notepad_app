@@ -69,6 +69,8 @@ class _LoginViewState extends State<LoginView> {
                   ),
                 );
               }
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/verify/', (route) => false);
             },
           ),
           TextButton(
