@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:notepad_app/views/login_view.dart';
 import 'package:notepad_app/views/register_view.dart';
 import 'package:notepad_app/views/verify_email_view.dart';
-import 'dart:developer' as devtools show log;
 import 'firebase_options.dart';
 
 void main() {
@@ -19,7 +18,7 @@ void main() {
       '/login/': (context) => const LoginView(),
       '/register/': (context) => const RegisterView(),
       '/verify/': (context) => const VerifyEmailView(),
-      '/main/': (context) => const NotesView()
+      '/notes/': (context) => const NotesView()
     },
   ));
 }
@@ -76,8 +75,10 @@ class _NotesViewState extends State<NotesView> {
                 if (shouldLoguout) {
                   await FirebaseAuth.instance.signOut();
                   if (mounted) {
-                    Navigator.of(context)
-                        .pushNamedAndRemoveUntil('/login/', (_) => false);
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      '/login/',
+                      (_) => false,
+                    );
                   }
                 }
                 break;
@@ -85,7 +86,9 @@ class _NotesViewState extends State<NotesView> {
           }, itemBuilder: (context) {
             return [
               const PopupMenuItem(
-                  value: MenuAction.logout, child: Text('Log out'))
+                value: MenuAction.logout,
+                child: Text('Log out'),
+              )
             ];
           })
         ],
