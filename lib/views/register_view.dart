@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as devtools show log;
 
 class RegisterView extends StatefulWidget {
   const RegisterView({Key? key}) : super(key: key);
@@ -51,9 +52,8 @@ class _RegisterViewState extends State<RegisterView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                final userCredential = await FirebaseAuth.instance
-                    .createUserWithEmailAndPassword(
-                        email: email, password: password);
+                await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                    email: email, password: password);
               } on FirebaseAuthException catch (e) {
                 showDialog<String>(
                   context: context,
@@ -68,6 +68,13 @@ class _RegisterViewState extends State<RegisterView> {
                     ],
                   ),
                 );
+              }
+              if (!mounted) {
+                return;
+              }
+              if (FirebaseAuth.instance.currentUser != null) {
+                Navigator.of(context)
+                    .pushNamedAndRemoveUntil('/login/', (route) => false);
               }
             },
           ),

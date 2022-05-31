@@ -19,7 +19,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
             TextButton(
               onPressed: () async {
                 final user = FirebaseAuth.instance.currentUser;
-                print(user);
+
                 try {
                   await user?.sendEmailVerification();
                 } on FirebaseAuthException catch (e) {
@@ -41,8 +41,10 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
               child: const Text("Send verification email"),
             ),
             TextButton(
-                onPressed: () {
-                  FirebaseAuth.instance.signOut();
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.of(context)
+                      .pushNamedAndRemoveUntil('/login/', (route) => false);
                 },
                 child: const Text("Signout"))
           ],
