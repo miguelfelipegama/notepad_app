@@ -74,7 +74,7 @@ class _LoginViewState extends State<LoginView> {
                 }
                 if (FirebaseAuth.instance.currentUser?.emailVerified ?? false) {
                   Navigator.of(context)
-                      .pushNamedAndRemoveUntil('/main/', (route) => false);
+                      .pushNamedAndRemoveUntil('/notes/', (route) => false);
                 } else if (FirebaseAuth.instance.currentUser != null) {
                   Navigator.of(context)
                       .pushNamedAndRemoveUntil('/verify/', (route) => false);

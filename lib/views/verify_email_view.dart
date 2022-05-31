@@ -43,8 +43,10 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
             TextButton(
                 onPressed: () async {
                   await FirebaseAuth.instance.signOut();
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil('/login/', (route) => false);
+                  if (mounted) {
+                    Navigator.of(context)
+                        .pushNamedAndRemoveUntil('/login/', (route) => false);
+                  }
                 },
                 child: const Text("Signout"))
           ],
