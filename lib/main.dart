@@ -68,8 +68,17 @@ class _NotesViewState extends State<NotesView> {
       appBar: AppBar(
         title: const Text('Your Notes'),
         actions: [
-          PopupMenuButton<MenuAction>(onSelected: (value) {
-            devtools.log(value.toString());
+          PopupMenuButton<MenuAction>(onSelected: (value) async {
+            switch (value) {
+              case MenuAction.logout:
+                final shouldLoguout = await showLogOutDialog(context);
+                if (shouldLoguout) {
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.of(context)
+                      .pushNamedAndRemoveUntil('/login/', (_) => false);
+                }
+                break;
+            }
           }, itemBuilder: (context) {
             return [
               const PopupMenuItem(
@@ -80,4 +89,24 @@ class _NotesViewState extends State<NotesView> {
       ),
     );
   }
+}
+
+Future<bool> showLogOutDialog(BuildContext context) {
+  return showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Logout Confirmation'),
+      content: const Text('Are you sure?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: const Text('Logout'),
+        ),
+      ],
+    ),
+  ).then((value) => value ?? false);
 }
