@@ -55,17 +55,25 @@ class _RegisterViewState extends State<RegisterView> {
               try {
                 await FirebaseAuth.instance.createUserWithEmailAndPassword(
                     email: email, password: password);
+                await FirebaseAuth.instance.currentUser
+                    ?.sendEmailVerification();
+                if (mounted) {
+                  Navigator.of(context).pushNamed(verifyRoute);
+                }
               } on FirebaseAuthException catch (e) {
-                showErrorDialog(context, 'Error: ${e.code}');
+                switch (e.code) {
+                  case 'email-already-in-use':
+                    showErrorDialog(context, 'Email already in use.');
+                    break;
+                  case 'invalid-email':
+                    showErrorDialog(context, 'This is an invalid email adress');
+                    break;
+                  default:
+                    showErrorDialog(context, 'Error: ${e.code}');
+                    break;
+                }
               } catch (e) {
                 showErrorDialog(context, e.toString());
-              }
-              if (!mounted) {
-                return;
-              }
-              if (FirebaseAuth.instance.currentUser != null) {
-                Navigator.of(context)
-                    .pushNamedAndRemoveUntil(loginRoute, (route) => false);
               }
             },
           ),

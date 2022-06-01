@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 Future<void> showErrorDialog(
@@ -13,7 +15,8 @@ Future<void> showErrorDialog(
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop;
+                  Navigator.of(context).pop();
+                  log('Clicked');
                 },
                 child: const Text('Ok'),
               )

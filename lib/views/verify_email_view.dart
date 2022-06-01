@@ -17,7 +17,8 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
         appBar: AppBar(title: const Text('Verify')),
         body: Column(
           children: [
-            const Text("Please verify your email adress:"),
+            const Text(
+                "Please verify your email, We have sent a verification e-mail, check spam"),
             TextButton(
               onPressed: () async {
                 final user = FirebaseAuth.instance.currentUser;
@@ -28,7 +29,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                   showErrorDialog(context, 'Error: ${e.code}');
                 }
               },
-              child: const Text("Send verification email"),
+              child: const Text("Re-send verification e-mail."),
             ),
             TextButton(
                 onPressed: () async {
