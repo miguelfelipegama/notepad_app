@@ -57,6 +57,8 @@ class _RegisterViewState extends State<RegisterView> {
                     email: email, password: password);
               } on FirebaseAuthException catch (e) {
                 showErrorDialog(context, 'Error: ${e.code}');
+              } catch (e) {
+                showErrorDialog(context, e.toString());
               }
               if (!mounted) {
                 return;
