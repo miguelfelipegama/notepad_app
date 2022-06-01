@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:notepad_app/constants/routes.dart';
+import 'package:notepad_app/utilities/show_error_dialog.dart';
 
 class VerifyEmailView extends StatefulWidget {
   const VerifyEmailView({Key? key}) : super(key: key);
@@ -24,19 +25,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                 try {
                   await user?.sendEmailVerification();
                 } on FirebaseAuthException catch (e) {
-                  showDialog<String>(
-                    context: context,
-                    builder: (BuildContext context) => AlertDialog(
-                      title: const Text('Verification Error'),
-                      content: Text(e.code.toString()),
-                      actions: <Widget>[
-                        TextButton(
-                          onPressed: () => Navigator.pop(context, 'OK'),
-                          child: const Text('OK'),
-                        ),
-                      ],
-                    ),
-                  );
+                  showErrorDialog(context, 'Error: ${e.code}');
                 }
               },
               child: const Text("Send verification email"),
