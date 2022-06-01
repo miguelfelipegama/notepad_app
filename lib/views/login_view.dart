@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:notepad_app/constants/routes.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -74,20 +75,20 @@ class _LoginViewState extends State<LoginView> {
                 }
                 if (FirebaseAuth.instance.currentUser?.emailVerified ?? false) {
                   Navigator.of(context)
-                      .pushNamedAndRemoveUntil('/notes/', (route) => false);
+                      .pushNamedAndRemoveUntil(notesRoute, (route) => false);
                 } else if (FirebaseAuth.instance.currentUser != null) {
                   Navigator.of(context)
-                      .pushNamedAndRemoveUntil('/verify/', (route) => false);
+                      .pushNamedAndRemoveUntil(verifyRoute, (route) => false);
                 } else {
                   Navigator.of(context)
-                      .pushNamedAndRemoveUntil('/login/', (route) => false);
+                      .pushNamedAndRemoveUntil(loginRoute, (route) => false);
                 }
               },
             ),
             TextButton(
                 onPressed: () {
                   Navigator.of(context)
-                      .pushNamedAndRemoveUntil('/register/', (route) => false);
+                      .pushNamedAndRemoveUntil(registerRoute, (route) => false);
                 },
                 child: const Text("Register"))
           ])
