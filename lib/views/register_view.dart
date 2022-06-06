@@ -1,6 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:notepad_app/constants/routes.dart';
+import 'package:notepad_app/services/auth_exceptions.dart';
+import 'package:notepad_app/services/auth_service.dart';
 import 'package:notepad_app/utilities/show_error_dialog.dart';
 
 class RegisterView extends StatefulWidget {
@@ -53,27 +54,21 @@ class _RegisterViewState extends State<RegisterView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                    email: email, password: password);
-                await FirebaseAuth.instance.currentUser
-                    ?.sendEmailVerification();
+                await AuthService.firebase()
+                    .createUser(email: email, password: password);
+
+                await AuthService.firebase().sendEmailVerification();
                 if (mounted) {
                   Navigator.of(context).pushNamed(verifyRoute);
                 }
-              } on FirebaseAuthException catch (e) {
-                switch (e.code) {
-                  case 'email-already-in-use':
-                    showErrorDialog(context, 'Email already in use.');
-                    break;
-                  case 'invalid-email':
-                    showErrorDialog(context, 'This is an invalid email adress');
-                    break;
-                  default:
-                    showErrorDialog(context, 'Error: ${e.code}');
-                    break;
-                }
-              } catch (e) {
-                showErrorDialog(context, e.toString());
+              } on EmailinUseAuthException {
+                showErrorDialog(context, 'Email already in use.');
+              } on InvalidEmailAuthException {
+                showErrorDialog(context, 'This is an invalid email adress');
+              } on WeakPasswordAuthException {
+                showErrorDialog(context, 'Weak password.');
+              } on GenericAuthException {
+                showErrorDialog(context, 'Registration Error');
               }
             },
           ),

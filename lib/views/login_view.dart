@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:notepad_app/constants/routes.dart';
+import 'package:notepad_app/services/auth_exceptions.dart';
+import 'package:notepad_app/services/auth_service.dart';
 
 import '../utilities/show_error_dialog.dart';
 
@@ -55,31 +56,23 @@ class _LoginViewState extends State<LoginView> {
                 final email = _email.text;
                 final password = _password.text;
                 try {
-                  await FirebaseAuth.instance.signInWithEmailAndPassword(
-                      email: email, password: password);
-                } on FirebaseAuthException catch (e) {
-                  switch (e.code) {
-                    case 'user-not-found':
-                      await showErrorDialog(context, 'User not found');
-                      break;
-                    case 'wrong-password':
-                      await showErrorDialog(context, 'Wrong Password');
-                      break;
-                    default:
-                      await showErrorDialog(context, 'Error: ${e.code}');
-                      break;
-                  }
-                } catch (e) {
-                  await showErrorDialog(context, e.toString());
+                  await AuthService.firebase()
+                      .logIn(email: email, password: password);
+                } on WrongPasswordAuthException catch (_) {
+                  await showErrorDialog(context, 'Wrong Password.');
+                } on UserNotFoundAuthException catch (_) {
+                  await showErrorDialog(context, 'User not found.');
+                } on GenericAuthException catch (_) {
+                  await showErrorDialog(context, 'Authentication Error.');
                 }
-
                 if (!mounted) {
                   return;
                 }
-                if (FirebaseAuth.instance.currentUser?.emailVerified ?? false) {
+                if (AuthService.firebase().currentUser?.isEmailVerified ??
+                    false) {
                   Navigator.of(context)
                       .pushNamedAndRemoveUntil(notesRoute, (route) => false);
-                } else if (FirebaseAuth.instance.currentUser != null) {
+                } else if (AuthService.firebase().currentUser != null) {
                   Navigator.of(context)
                       .pushNamedAndRemoveUntil(verifyRoute, (route) => false);
                 } else {
