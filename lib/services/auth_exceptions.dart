@@ -1,6 +1,6 @@
 // login exceptions
 
-class UserrNotFoundAuthException implements Exception {}
+class UserNotFoundAuthException implements Exception {}
 
 class WrongPasswordAuthException implements Exception {}
 
