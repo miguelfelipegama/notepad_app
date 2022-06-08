@@ -3,39 +3,124 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart'
     show getApplicationDocumentsDirectory, MissingPlatformDirectoryException;
 import 'package:path/path.dart' show join;
-
-const idColumn = 'id';
-const emailColumn = 'email';
-const userIdColumn = 'user_id';
-const textColumn = 'text';
-const isSyncedtoCloudColumn = 'issyncedtocloud';
-const dbName = 'notes.db';
-const noteTable = 'note';
-const userTable = 'user';
-const createUserTable = '''CREATE TABLE IF NOT EXISTS "user" (
-        "id" INTEGER NOT NULL,
-        "email" TEXT NOT NULL UNIQUE,
-        PRIMARY KEY("id" AUTOINCREMENT)
-      ); ''';
-const createNoteTable = ''' CREATE TABLE IF NOT EXISTS "note" (
-        "id" INTEGER NOT NULL,
-        "user_id" INTEGER NOT NULL,
-        "text" TEXT,
-        "issyncedtocloud" INTEGER NOT NULL DEFAULT 0,
-        FOREIGN KKEY("user_id) REFERENCES "user"("id"),
-        PRIMARY KEY("id" AUTOINCREMENT)
-        ); ''';
-
-class DatabaseAlreadyOpenException implements Exception {}
-
-class DatabaseNotOpenException implements Exception {}
-
-class UnableToGetDocumentsDirectoryException implements Exception {}
+import 'constants_exceptions.dart';
 
 class NotesService {
   Database? _db;
 
-  Database _getDatabaseOrThrow() {}
+  Future<Iterable<DatabaseNote>> getAllNotes() async {
+    final db = _getDatabaseOrThrow();
+    final notes = await db.query(noteTable);
+    return notes.map((noteRow) => DatabaseNote.fromRow(noteRow));
+  }
+
+  Future<DatabaseNote> getNote({required int id}) async {
+    final db = _getDatabaseOrThrow();
+    final notes = await db.query(
+      noteTable,
+      limit: 1,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (notes.isEmpty) {
+      throw CouldNotFindNote();
+    } else {
+      return DatabaseNote.fromRow(notes.first);
+    }
+  }
+
+  Future<int> deleteAllNotes() async {
+    final db = _getDatabaseOrThrow();
+    return await db.delete(noteTable);
+  }
+
+  Future<void> deleteNote({required int id}) async {
+    final db = _getDatabaseOrThrow();
+    final deletedCount = await db.delete(
+      noteTable,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (deletedCount != 1) {
+      throw CouldNotDeleteNote();
+    }
+  }
+
+  Future<DatabaseNote> createNote({required DatabaseUser owner}) async {
+    final db = _getDatabaseOrThrow();
+
+    final dbUser = await getUser(email: owner.email);
+
+    if (owner != dbUser) {
+      throw CouldNotFindUser();
+    }
+
+    const text = '';
+
+    final noteId = await db.insert(noteTable, {
+      userIdColumn: owner.id,
+      textColumn: text,
+      isSyncedtoCloudColumn: 1,
+    });
+
+    final note = DatabaseNote(
+        id: noteId, userId: owner.id, text: text, isSyncedtoCloud: true);
+
+    return note;
+  }
+
+  Future<DatabaseUser> getUser({required String email}) async {
+    final db = _getDatabaseOrThrow();
+    final results = await db.query(
+      userTable,
+      limit: 1,
+      where: 'email = ?',
+      whereArgs: [email.toLowerCase()],
+    );
+    if (results.isEmpty) {
+      throw CouldNotFindUser();
+    } else {
+      return DatabaseUser.fromRow(results.first);
+    }
+  }
+
+  Future<DatabaseUser> createUser({required String email}) async {
+    final db = _getDatabaseOrThrow();
+    final results = await db.query(
+      userTable,
+      limit: 1,
+      where: 'email = ?',
+      whereArgs: [email.toLowerCase()],
+    );
+    if (results.isNotEmpty) {
+      throw UserAlreadyExists();
+    }
+    final userId =
+        await db.insert(userTable, {emailColumn: email.toLowerCase()});
+
+    return DatabaseUser(id: userId, email: email);
+  }
+
+  Future<void> deleteUser({required String email}) async {
+    final db = _getDatabaseOrThrow();
+    final deletedCount = await db.delete(
+      userTable,
+      where: 'email = ?',
+      whereArgs: [email.toLowerCase()],
+    );
+    if (deletedCount != 1) {
+      throw CouldNotDeleteUser();
+    }
+  }
+
+  Database _getDatabaseOrThrow() {
+    final db = _db;
+    if (db == null) {
+      throw DatabaseNotOpenException();
+    } else {
+      return db;
+    }
+  }
 
   Future<void> open() async {
     if (_db != null) {
