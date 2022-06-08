@@ -12,13 +12,30 @@ const isSyncedtoCloudColumn = 'issyncedtocloud';
 const dbName = 'notes.db';
 const noteTable = 'note';
 const userTable = 'user';
+const createUserTable = '''CREATE TABLE IF NOT EXISTS "user" (
+        "id" INTEGER NOT NULL,
+        "email" TEXT NOT NULL UNIQUE,
+        PRIMARY KEY("id" AUTOINCREMENT)
+      ); ''';
+const createNoteTable = ''' CREATE TABLE IF NOT EXISTS "note" (
+        "id" INTEGER NOT NULL,
+        "user_id" INTEGER NOT NULL,
+        "text" TEXT,
+        "issyncedtocloud" INTEGER NOT NULL DEFAULT 0,
+        FOREIGN KKEY("user_id) REFERENCES "user"("id"),
+        PRIMARY KEY("id" AUTOINCREMENT)
+        ); ''';
 
 class DatabaseAlreadyOpenException implements Exception {}
+
+class DatabaseNotOpenException implements Exception {}
 
 class UnableToGetDocumentsDirectoryException implements Exception {}
 
 class NotesService {
   Database? _db;
+
+  Database _getDatabaseOrThrow() {}
 
   Future<void> open() async {
     if (_db != null) {
@@ -29,8 +46,23 @@ class NotesService {
       final dbPath = join(docsPath.path, dbName);
       final db = await openDatabase(dbPath);
       _db = db;
+
+      await db.execute(createUserTable);
+
+      await db.execute(createNoteTable);
     } on MissingPlatformDirectoryException {
       throw UnableToGetDocumentsDirectoryException();
+    }
+  }
+
+  Future<void> close() async {
+    final db = _db;
+
+    if (db == null) {
+      throw DatabaseNotOpenException();
+    } else {
+      await db.close();
+      _db = null;
     }
   }
 }
