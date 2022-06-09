@@ -34,4 +34,6 @@ class CouldNotFindUser implements Exception {}
 
 class CouldNotFindNote implements Exception {}
 
+class CouldNotUpdateNote implements Exception {}
+
 class UserAlreadyExists implements Exception {}

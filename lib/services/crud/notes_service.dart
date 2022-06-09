@@ -8,6 +8,26 @@ import 'constants_exceptions.dart';
 class NotesService {
   Database? _db;
 
+  Future<DatabaseNote> updateNote(
+      {required DatabaseNote note, required String text}) async {
+    final db = _getDatabaseOrThrow();
+    await getNote(id: note.id);
+    final updatesCount = await db.update(
+      noteTable,
+      {
+        textColumn: text,
+        isSyncedtoCloudColumn: 0,
+      },
+      where: " 'id' = ?",
+      whereArgs: [note.id],
+    );
+    if (updatesCount == 0) {
+      throw CouldNotUpdateNote();
+    } else {
+      return await getNote(id: note.id);
+    }
+  }
+
   Future<Iterable<DatabaseNote>> getAllNotes() async {
     final db = _getDatabaseOrThrow();
     final notes = await db.query(noteTable);
