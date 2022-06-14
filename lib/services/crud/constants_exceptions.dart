@@ -16,7 +16,7 @@ const createNoteTable = ''' CREATE TABLE IF NOT EXISTS "note" (
         "user_id" INTEGER NOT NULL,
         "text" TEXT,
         "issyncedtocloud" INTEGER NOT NULL DEFAULT 0,
-        FOREIGN KKEY("user_id) REFERENCES "user"("id"),
+        FOREIGN KEY("user_id) REFERENCES "user"("id"),
         PRIMARY KEY("id" AUTOINCREMENT)
         ); ''';
 
