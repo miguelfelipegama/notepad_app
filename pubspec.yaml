@@ -63,7 +63,7 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 dependency_overrides:
-  flutter_lints: ^2.0.0
+  flutter_lints: ^2.0.1
 
 # The following section is specific to Flutter.
 flutter:
