@@ -1,27 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:notepad_app/services/auth/auth_service.dart';
 import 'package:notepad_app/services/crud/notes_service.dart';
+import 'package:notepad_app/utilities/generics/get_arguments.dart';
 
-class NewNoteView extends StatefulWidget {
-  const NewNoteView({Key? key}) : super(key: key);
+class CreateUpdateNoteView extends StatefulWidget {
+  const CreateUpdateNoteView({Key? key}) : super(key: key);
 
   @override
-  State<NewNoteView> createState() => _NewNoteViewState();
+  State<CreateUpdateNoteView> createState() => _CreateUpdateNoteViewState();
 }
 
-class _NewNoteViewState extends State<NewNoteView> {
+class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   DatabaseNote? _note;
   late final NotesService _notesService;
   late final TextEditingController _textEditingController;
 
-  Future<DatabaseNote> createNewNote() async {
+  Future<DatabaseNote> createOrGetNote(BuildContext context) async {
+    final widgetNote = context.getArgument<DatabaseNote>();
+    if (widgetNote != null) {
+      _note = widgetNote;
+      _textEditingController.text = widgetNote.text;
+      return widgetNote;
+    }
     final existingNote = _note;
     if (existingNote != null) {
       return existingNote;
     }
     final owner = await _notesService.getUser(
         email: AuthService.firebase().currentUser!.email);
-    return _notesService.createNote(owner: owner);
+    final newNote = await _notesService.createNote(owner: owner);
+    _note = newNote;
+    return newNote;
   }
 
   void _deleteNoteIfTextIsEmpty() async {
@@ -75,10 +84,10 @@ class _NewNoteViewState extends State<NewNoteView> {
         title: const Text('New Note'),
       ),
       body: FutureBuilder(
+        future: createOrGetNote(context),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
-              _note = snapshot.data as DatabaseNote;
               _setupTextContListener();
               return TextField(
                 controller: _textEditingController,
@@ -90,7 +99,6 @@ class _NewNoteViewState extends State<NewNoteView> {
               return const CircularProgressIndicator();
           }
         },
-        future: createNewNote(),
       ),
     );
   }

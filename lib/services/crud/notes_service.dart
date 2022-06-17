@@ -67,9 +67,10 @@ class NotesService {
         textColumn: text,
         isSyncedtoCloudColumn: 0,
       },
-      where: " 'id' = ?",
+      where: 'id = ?',
       whereArgs: [note.id],
     );
+
     if (updatesCount == 0) {
       throw CouldNotUpdateNote();
     } else {
@@ -230,6 +231,7 @@ class NotesService {
 
       await db.execute(createUserTable);
       await db.execute(createNoteTable);
+
       await _cacheNotes();
     } on MissingPlatformDirectoryException {
       throw UnableToGetDocumentsDirectoryException();
@@ -288,7 +290,7 @@ class DatabaseNote {
   DatabaseNote.fromRow(Map<String, Object?> map)
       : id = map[idColumn] as int,
         userId = map[userIdColumn] as int,
-        text = map[userIdColumn] as String,
+        text = map[textColumn] as String,
         isSyncedtoCloud =
             (map[isSyncedtoCloudColumn] as int) == 1 ? true : false;
 
