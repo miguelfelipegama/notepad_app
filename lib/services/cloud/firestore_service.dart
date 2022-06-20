@@ -11,8 +11,15 @@ class FirestoreCloudService {
   factory FirestoreCloudService() => _shared;
   FirestoreCloudService._sharedIsntance();
 
-  void createNewNote({required String ownerId}) async {
-    await notes.add({ownerIdFieldName: ownerId, textFieldName: ''});
+  Future<CloudNote> createNewNote({required String ownerId}) async {
+    final document =
+        await notes.add({ownerIdFieldName: ownerId, textFieldName: ''});
+    final resultNote = await document.get();
+    return CloudNote(
+      documentId: resultNote.id,
+      ownerID: ownerId,
+      text: '',
+    );
   }
 
   Future<Iterable<CloudNote>> getNotes({required String ownerID}) async {
@@ -57,7 +64,7 @@ class FirestoreCloudService {
     }
   }
 
-  Future<void> deletNote({
+  Future<void> deleteNote({
     required String docId,
   }) async {
     try {
