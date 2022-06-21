@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:notepad_app/constants/routes.dart';
 import 'package:notepad_app/services/auth/auth_exceptions.dart';
 import 'package:notepad_app/services/auth/auth_service.dart';
+import 'package:notepad_app/services/auth/bloc/auth_bloc.dart';
+import 'package:notepad_app/services/auth/bloc/auth_event.dart';
 
 import '../utilities/dialogs/error_dialog.dart';
 
@@ -55,30 +58,10 @@ class _LoginViewState extends State<LoginView> {
               onPressed: () async {
                 final email = _email.text;
                 final password = _password.text;
-                try {
-                  await AuthService.firebase()
-                      .logIn(email: email, password: password);
-                } on WrongPasswordAuthException catch (_) {
-                  await showErrorDialog(context, 'Wrong Password.');
-                } on UserNotFoundAuthException catch (_) {
-                  await showErrorDialog(context, 'User not found.');
-                } on GenericAuthException catch (_) {
-                  await showErrorDialog(context, 'Authentication Error.');
-                }
-                if (!mounted) {
-                  return;
-                }
-                if (AuthService.firebase().currentUser?.isEmailVerified ??
-                    false) {
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil(notesRoute, (route) => false);
-                } else if (AuthService.firebase().currentUser != null) {
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil(verifyRoute, (route) => false);
-                } else {
-                  Navigator.of(context)
-                      .pushNamedAndRemoveUntil(loginRoute, (route) => false);
-                }
+                context.read<AuthBloc>().add(AuthEventLogIn(
+                      email,
+                      password,
+                    ));
               },
             ),
             TextButton(
