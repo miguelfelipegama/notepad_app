@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:notepad_app/services/auth/auth_service.dart';
 import 'package:notepad_app/services/cloud/cloud_note.dart';
 import 'package:notepad_app/services/cloud/firestore_service.dart';
-import 'package:notepad_app/services/cloud/cloud_exceptions.dart';
 import 'package:notepad_app/utilities/dialogs/share_empty_note_dialog.dart';
 import 'package:notepad_app/utilities/generics/get_arguments.dart';
 import 'package:share_plus/share_plus.dart';

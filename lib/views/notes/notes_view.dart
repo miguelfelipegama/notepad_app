@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:notepad_app/services/auth/auth_service.dart';
-import 'package:notepad_app/services/auth/firebase_auth_provider.dart';
 import 'package:notepad_app/services/cloud/cloud_note.dart';
 import 'package:notepad_app/services/cloud/firestore_service.dart';
 import 'package:notepad_app/views/notes/notes_list_view.dart';
