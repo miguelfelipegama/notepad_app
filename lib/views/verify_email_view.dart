@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:notepad_app/constants/routes.dart';
-import 'package:notepad_app/services/auth/auth_exceptions.dart';
-import 'package:notepad_app/services/auth/auth_service.dart';
-import 'package:notepad_app/utilities/dialogs/error_dialog.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../services/auth/bloc/auth_bloc.dart';
+import '../services/auth/bloc/auth_event.dart';
 
 class VerifyEmailView extends StatefulWidget {
   const VerifyEmailView({Key? key}) : super(key: key);
@@ -21,22 +21,14 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
             const Text(
                 "Please verify your email, We have sent a verification e-mail, check spam"),
             TextButton(
-              onPressed: () async {
-                try {
-                  await AuthService.firebase().sendEmailVerification();
-                } on GenericAuthException {
-                  showErrorDialog(context, 'Verification Exception on View');
-                }
+              onPressed: () {
+                context.read<AuthBloc>().add(const AuthEventSendEmail());
               },
               child: const Text("Re-send verification e-mail."),
             ),
             TextButton(
-                onPressed: () async {
-                  await AuthService.firebase().logOut();
-                  if (mounted) {
-                    Navigator.of(context)
-                        .pushNamedAndRemoveUntil(loginRoute, (route) => false);
-                  }
+                onPressed: () {
+                  context.read<AuthBloc>().add(const AuthEventLogOut());
                 },
                 child: const Text("Signout"))
           ],
