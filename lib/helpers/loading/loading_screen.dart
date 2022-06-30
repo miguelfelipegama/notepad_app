@@ -1,7 +1,5 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:notepad_app/helpers/loading/loading_screen_controller.dart';
 
 class LoadingScreen {
@@ -16,12 +14,23 @@ class LoadingScreen {
     controller = null;
   }
 
+  void show({required BuildContext context, required String text}) {
+    if (controller?.update(text) ?? false) {
+      return;
+    } else {
+      controller = showOverlay(
+        context: context,
+        text: text,
+      );
+    }
+  }
+
   LoadingScreenController showOverlay({
     required BuildContext context,
     required String text,
   }) {
-    final _text = StreamController<String>();
-    _text.add(text);
+    final textController = StreamController<String>();
+    textController.add(text);
 
     final state = Overlay.of(context);
     final renderBox = context.findRenderObject() as RenderBox;
@@ -65,7 +74,7 @@ class LoadingScreen {
                           return Container();
                         }
                       },
-                      stream: _text.stream,
+                      stream: textController.stream,
                     )
                   ],
                 ),
@@ -79,11 +88,11 @@ class LoadingScreen {
     state?.insert(overlay);
 
     return LoadingScreenController(close: () {
-      _text.close();
+      textController.close();
       overlay.remove();
       return true;
     }, update: (text) {
-      _text.add(text);
+      textController.add(text);
       return true;
     });
   }
