@@ -14,11 +14,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthEventForgotPasswd>((event, emit) async {
       bool didSend = false;
       Exception? psswdException;
-      emit(AuthStateForgotPasswd(
-        isLoading: false,
-        exception: psswdException,
-        hasSentEmail: didSend,
-      ));
       final email = event.email;
       emit(AuthStateForgotPasswd(
         isLoading: true,
@@ -34,6 +29,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         didSend = false;
         psswdException = e;
       }
+      print(psswdException);
       emit(AuthStateForgotPasswd(
         isLoading: false,
         exception: psswdException,

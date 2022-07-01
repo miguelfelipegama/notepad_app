@@ -90,7 +90,14 @@ class _LoginViewState extends State<LoginView> {
                           const AuthEventRegisterView(),
                         );
                   },
-                  child: const Text("Register"))
+                  child: const Text("Register")),
+              TextButton(
+                  onPressed: () {
+                    context.read<AuthBloc>().add(
+                          AuthEventForgotPasswd(email: _email.text),
+                        );
+                  },
+                  child: const Text("Reset Password"))
             ])
           ])),
     );

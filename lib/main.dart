@@ -6,6 +6,7 @@ import 'package:notepad_app/services/auth/bloc/auth_bloc.dart';
 import 'package:notepad_app/services/auth/bloc/auth_event.dart';
 import 'package:notepad_app/services/auth/bloc/auth_state.dart';
 import 'package:notepad_app/services/auth/firebase_auth_provider.dart';
+import 'package:notepad_app/views/forgot_passwd_view.dart';
 import 'package:notepad_app/views/login_view.dart';
 import 'package:notepad_app/views/notes/create_update_note_view.dart';
 import 'package:notepad_app/views/notes/notes_view.dart';
@@ -45,6 +46,8 @@ class HomePage extends StatelessWidget {
           return const LoginView();
         } else if (state is AuthEventRegisterView) {
           return const RegisterView();
+        } else if (state is AuthStateForgotPasswd) {
+          return const ForgotPasswdView();
         } else {
           return const Scaffold(body: CircularProgressIndicator());
         }
