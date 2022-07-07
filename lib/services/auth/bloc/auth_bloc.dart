@@ -11,6 +11,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(state);
     });
 
+    on<AuthEventRegisterView>((event, emit) {
+      emit(const AuthStateRegistering(exception: null, isLoading: false));
+    });
+
     on<AuthEventForgotPasswd>((event, emit) async {
       bool didSend = false;
       Exception? psswdException;
@@ -29,7 +33,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         didSend = false;
         psswdException = e;
       }
-      print(psswdException);
       emit(AuthStateForgotPasswd(
         isLoading: false,
         exception: psswdException,

@@ -57,49 +57,52 @@ class _LoginViewState extends State<LoginView> {
       },
       child: Scaffold(
           appBar: AppBar(title: const Text('Login')),
-          body: Column(children: [
-            TextField(
-              decoration: const InputDecoration(hintText: 'Enter e-mail'),
-              enableSuggestions: false,
-              autocorrect: false,
-              keyboardType: TextInputType.emailAddress,
-              controller: _email,
-            ),
-            TextField(
-              decoration: const InputDecoration(hintText: 'Enter password'),
-              controller: _password,
-              obscureText: true,
-              enableSuggestions: false,
-              autocorrect: false,
-            ),
-            Row(children: [
-              TextButton(
-                child: const Text('Login'),
-                onPressed: () async {
-                  final email = _email.text;
-                  final password = _password.text;
-                  context.read<AuthBloc>().add(AuthEventLogIn(
-                        email,
-                        password,
-                      ));
-                },
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(children: [
+              TextField(
+                decoration: const InputDecoration(hintText: 'Enter e-mail'),
+                enableSuggestions: false,
+                autocorrect: false,
+                keyboardType: TextInputType.emailAddress,
+                controller: _email,
               ),
-              TextButton(
-                  onPressed: () {
-                    context.read<AuthBloc>().add(
-                          const AuthEventRegisterView(),
-                        );
+              TextField(
+                decoration: const InputDecoration(hintText: 'Enter password'),
+                controller: _password,
+                obscureText: true,
+                enableSuggestions: false,
+                autocorrect: false,
+              ),
+              Row(children: [
+                TextButton(
+                  child: const Text('Login'),
+                  onPressed: () async {
+                    final email = _email.text;
+                    final password = _password.text;
+                    context.read<AuthBloc>().add(AuthEventLogIn(
+                          email,
+                          password,
+                        ));
                   },
-                  child: const Text("Register")),
-              TextButton(
-                  onPressed: () {
-                    context.read<AuthBloc>().add(
-                          AuthEventForgotPasswd(email: _email.text),
-                        );
-                  },
-                  child: const Text("Reset Password"))
-            ])
-          ])),
+                ),
+                TextButton(
+                    onPressed: () {
+                      context.read<AuthBloc>().add(
+                            const AuthEventRegisterView(),
+                          );
+                    },
+                    child: const Text("Register")),
+                TextButton(
+                    onPressed: () {
+                      context.read<AuthBloc>().add(
+                            AuthEventForgotPasswd(email: _email.text),
+                          );
+                    },
+                    child: const Text("Reset Password"))
+              ])
+            ]),
+          )),
     );
   }
 }
